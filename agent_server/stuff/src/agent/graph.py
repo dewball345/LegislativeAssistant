@@ -1,6 +1,6 @@
 from typing import Annotated, Callable, TypeVar, Generic
 from typing_extensions import TypedDict
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 import requests
 import json
 import os
@@ -852,6 +852,51 @@ def should_revise(state):
     return "alignment" if state.get("should_revise", False) and state.get("correction_attempts", 0) < MAX_CORRECTION_ATTEMPTS else END
 
 
+class ScoreItem(BaseModel):
+    """Structure for an individual score with rationale"""
+    score: int = Field(description="Numeric score from 0-100")
+    rationale: str = Field(description="Brief explanation for the score")
+
+class ScoreRecord(BaseModel):
+    """Structure for all impact area scores"""
+    spending: ScoreItem
+    equity: ScoreItem
+    progress: ScoreItem 
+    environment: ScoreItem
+    personal: ScoreItem
+
+def generate_score(preferences: str, bill_context: str):
+    """Generate numeric scores (0-100) for key impact areas using structured output."""
+    
+    score_prompt = [{
+        "role": "system",
+        "content": """You are an expert policy analyst.
+        Based on the bill context and user preferences, generate numeric scores (0-100) for:
+        - Fiscal Responsibility Score: How well the bill manages spending and budgets
+        - Equity Score: How fairly benefits and impacts are distributed
+        - Progress Score: How much the bill advances meaningful change
+        - Environmental Score: Impact on sustainability and environment
+        - Personal Impact Score: Direct benefit to the user based on their profile
+        
+        Provide brief justification for each score."""
+    }, {
+        "role": "user",
+        "content": f"""Analyze and score based on:
+        
+        Bill Context: {bill_context}
+        User Preferences: {preferences}"""
+    }]
+    
+    print("BEFORE TRY")
+    # Use structured output
+    llm_struc = llm.with_structured_output(ScoreRecord)
+    
+    response = llm_struc.invoke(score_prompt)
+
+    # Convert Pydantic model to dict
+    return response.model_dump()
+
+    
 def generate_letter(preferences: str, bill_context: str):
     """Generate a professional letter to a representative incorporating user preferences and bill context."""
     letter_prompt = [{
@@ -990,6 +1035,8 @@ if __name__ == "__main__":
     for analysis in result["media_analysis"]:
         print(f"\n{analysis['source'].upper()}:")
         print(analysis['analysis'])
+
+
 
 
 

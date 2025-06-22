@@ -23,6 +23,22 @@
         </div>
     </nav>
 
+    <div class="container mb-4">
+        <div class="alert alert-info border-info small">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-robot fs-5"></i>
+                <div>
+                    <strong>AI-Generated Content Notice:</strong>
+                    <p class="mb-0">
+                        The analysis, scores, and explanations provided in these reports are generated using AI technology. 
+                        While we strive for accuracy, this content should be used as a starting point for your research. 
+                        We encourage you to verify specific claims through official government sources and independent research.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <main class="container pb-4">
         {@render children()}
     </main>

@@ -8,12 +8,14 @@
     import AnalysisCard from '$lib/components/AnalysisCard.svelte';
     import BenefitsDrawbacksCard from '$lib/components/BenefitsDrawbacksCard.svelte';
     import LetterGeneratorCard from '$lib/components/LetterGeneratorCard.svelte';
+    import ScoreCard from '$lib/components/ScoreCard.svelte';
 
     let { data }: { data: PageData } = $props();
     const reportId = $derived(data.id);
     let storedData: StoredData | null = $state(null);
     let userBenefits: any[] = $state([]);
     let userDrawbacks: any[] = $state([]);
+    let userProfile = $state<any>(null);
 
     $effect(() => {
         const pastReports = JSON.parse(localStorage.getItem('pastReports') || '[]');
@@ -23,19 +25,38 @@
             userBenefits = report.result.user_benefits?.[0]?.records || [];
             userDrawbacks = report.result.user_drawbacks?.[0]?.records || [];
         }
+        // Load user profile
+        const savedProfile = localStorage.getItem('userProfile');
+        if (savedProfile) {
+            userProfile = JSON.parse(savedProfile);
+        }
     });
 </script>
 
 <div class="container mt-4">
     <h2 class="mb-4 serif-header">Report for "{storedData ? storedData.bill_metadata.bill.title : "Loading"}"</h2>
 
-    {#if storedData?.summaries?.levels}
-        <SummaryCard levels={storedData.summaries.levels} />
-    {:else}
-        <div class="alert alert-info">
-            No data found for this report.
+    <div class="row g-4">
+        <div class="col-md-8">
+            {#if storedData?.summaries?.levels}
+                <SummaryCard levels={storedData.summaries.levels} />
+            {:else}
+                <div class="alert alert-info">
+                    No data found for this report.
+                </div>
+            {/if}
         </div>
-    {/if}
+        {#if storedData && userProfile}
+            <div class="col-md-4 mt-4">
+                <ScoreCard 
+                    profile={userProfile}
+                    billContext={JSON.stringify(storedData)}
+                />
+            </div>
+        {/if}
+    </div>
+
+
 
     {#if storedData?.bill_history}
         <BillHistoryCard history={storedData.bill_history} />

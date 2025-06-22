@@ -9,7 +9,7 @@ from agent.types import (
     AlignmentRecords
 )
 from agent import graph
-from agent.graph import generate_letter
+from agent.graph import generate_letter, generate_score
 
 def convert_to_json_serializable(obj: Any) -> Any:
     """Convert a langgraph output to JSON-serializable format."""
@@ -40,6 +40,10 @@ class WorkflowRequest(BaseModel):
     bill_num: int
 
 class LetterRequest(BaseModel):
+    preferences: str
+    bill_context: str
+
+class ScoreRequest(BaseModel):
     preferences: str
     bill_context: str
 
@@ -130,6 +134,20 @@ async def write_letter(request: LetterRequest) -> Dict[str, Any]:
             "status": "error",
             "message": str(e)
         }
+
+@app.post("/generate_score")
+async def generate_bill_score(request: ScoreRequest) -> Dict[str, Any]:
+    """Generate impact scores for a bill based on preferences and context."""
+    print("HIIIIIIII update")
+    
+    scores = generate_score(request.preferences, request.bill_context)
+    print(scores)
+    return {
+        "status": "success",
+        "scores": scores
+    }
+
+
 
 if __name__ == "__main__":
     import uvicorn
