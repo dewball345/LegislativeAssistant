@@ -58,8 +58,8 @@
 
 
 
-    {#if storedData?.bill_history}
-        <BillHistoryCard history={storedData.bill_history} />
+    {#if storedData?.bill_history_analysis}
+        <BillHistoryCard history={storedData.bill_history_analysis} />
     {/if}
 
     {#if storedData?.summaries?.rep_profiles}
@@ -70,7 +70,7 @@
         <AnalysisCard 
             title="Pork Barrel Spending Analysis"
             records={storedData.pork_barrel_spending[0].records}
-            explanation="Identifies any extra spending or special projects added to this bill that might benefit specific districts or special interests rather than serving a national purpose."
+            explanation="Identifies any extra spending or special projects added to this bill that might benefit specific districts or special interests rather than serving a national purpose. Pork barrel spending may not always be bad--analyze each provision individually and feel free to clarify to the representative at the bottom."
         />
     {/if}
 
@@ -101,7 +101,7 @@
         />
     {/if}
 
-    <!-- {#if storedData}
+    {#if storedData}
         <DebugJsonCard data={storedData} />
-    {/if} -->
+    {/if}
 </div>

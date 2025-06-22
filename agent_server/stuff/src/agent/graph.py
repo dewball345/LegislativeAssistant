@@ -155,6 +155,7 @@ class State(TypedDict):
     bill_status: str
     bill_text: str
     bill_history: list
+    bill_history_analysis: list
     sponsors: list
     summaries: dict  # Will contain different levels of summaries
     
