@@ -49,6 +49,7 @@
         <AnalysisCard 
             title="Pork Barrel Spending Analysis"
             records={storedData.pork_barrel_spending[0].records}
+            explanation="Identifies any extra spending or special projects added to this bill that might benefit specific districts or special interests rather than serving a national purpose."
         />
     {/if}
 
@@ -56,6 +57,7 @@
         <AnalysisCard 
             title="Trojan Horse Provisions Analysis"
             records={storedData.trojan_horses[0].records}
+            explanation="Reveals hidden provisions or unexpected consequences that might be concealed within the bill's complex language."
         />
     {/if}
 
@@ -63,6 +65,7 @@
         <AnalysisCard 
             title="Sleeper Provisions Analysis"
             records={storedData.sleeper_provisions[0].records}
+            explanation="Highlights provisions that could have significant future impacts but might not be immediately apparent or take effect at a later date."
         />
     {/if}
 
@@ -77,7 +80,7 @@
         />
     {/if}
 
-    {#if storedData}
+    <!-- {#if storedData}
         <DebugJsonCard data={storedData} />
-    {/if}
+    {/if} -->
 </div>

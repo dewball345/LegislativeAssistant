@@ -10,42 +10,48 @@
 </script>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-<!-- -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-<main class="container my-3">
-    <a class="h3 mb-2" href="/home">Your Legislative Assistant</a>
-    <p class="text-italic small text-muted mb-3">TODO better name - but helps you understand the legislation your representatives are making--and empowers you to respond!</p>
+<div class="min-vh-100 bg-light">
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4">
+        <div class="container py-2">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/home">
+                <i class="bi bi-building-lock text-primary fs-4"></i>
+                <span class="fw-semibold">Your Legislative Assistant</span>
+            </a>
+            <p class="text-muted mb-0 ms-3 d-none d-md-block small">Empowering informed civic engagement</p>
+        </div>
+    </nav>
 
-    {@render children()}
-</main>
+    <main class="container pb-4">
+        {@render children()}
+    </main>
+</div>
 
 <style>
+    :global(body) {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
     :global(.card) {
-        font-size: 0.95rem;
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    :global(.card-header) {
-        padding: 0.5rem 1rem;
+
+    :global(.badge) {
+        font-weight: 500;
+        padding: 0.5em 0.85em;
     }
-    :global(.card-body) {
-        padding: 1rem;
+
+    :global(.accordion-button:not(.collapsed)) {
+        background-color: var(--bs-primary-bg-subtle);
+        color: var(--bs-primary);
     }
-    :global(.form-label) {
-        margin-bottom: 0.25rem;
-    }
-    :global(.form-control), :global(.form-select) {
-        padding: 0.375rem 0.5rem;
-        font-size: 0.95rem;
-    }
-    :global(.mb-3) {
-        margin-bottom: 0.75rem !important;
-    }
-    :global(.btn) {
-        padding: 0.25rem 0.75rem;
-    }
-    :global(.table td), :global(.table th) {
-        padding: 0.5rem;
-    }
-    :global(.h3) {
-        font-size: 1.5rem;
+
+    :global(.accordion-button:focus) {
+        box-shadow: none;
+        border-color: var(--bs-border-color);
     }
 </style>

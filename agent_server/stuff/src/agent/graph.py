@@ -45,7 +45,7 @@ can manage order how you like
 USE_CLAUDE = False  # Set to False to use Gemini
 ENABLE_CHUNKING = True  # Set to False to process full text without chunking
 MAX_CORRECTION_ATTEMPTS = 3  # Maximum number of times alignment can be corrected
-ENABLE_INVESTIGATION_CORRECTION = False #True  # Enable/disable investigation correction workflow
+ENABLE_INVESTIGATION_CORRECTION = True  # Enable/disable investigation correction workflow
 ENABLE_ALIGNMENT_CORRECTION = False #True  # Enable/disable alignment correction workflow
 
 def split_bill_text(text: str) -> list[Document]:
@@ -93,7 +93,7 @@ class BillHelper:
 
     def get_bill_versions(self):
         res_text = self.bill_api_call("/text")
-
+        print(res_text)
         bill_versions = res_text["textVersions"]
 
         all_versions = []
@@ -673,8 +673,8 @@ Ignore minor discrepancies, subjective interpretations, or reasonable extrapolat
     }
 
 def correction_investigative_agent(state: State):
-    """Validates investigative findings against the bill text to detect hallucinations.
-    Only triggers revisions for significant issues and clear misinformation."""
+    print("STATE RECEIVED BY CORRECTION INVESTIGATION AGENT")
+    """Validates that investigative findings correctly use legislative terms and concepts."""
     
     current_attempts = state.get("investigation_correction_attempts", 0) + 1
     
@@ -694,44 +694,71 @@ def correction_investigative_agent(state: State):
         }
 
     def validate_findings(findings, finding_type: str, text_chunks: list[Document], context: str = ""):
-        """Helper to validate investigative findings against the source text chunks.
-        Focus on identifying clear factual errors and significant misinformation."""
+        """Helper to validate correct usage of legislative terms and concepts in findings."""
         all_validations = []
         
         llm_response = llm.invoke([{
             "role": "system",
-            "content": f"Summarize the key factual claims and specific assertions from these {finding_type} findings."
+            "content": f"Summarize the key legislative terms and concepts identified in these {finding_type} findings."
         }, {
             "role": "user",
             "content": f"Findings: {findings}"
         }])
         findings_summary = llm_response.content
         
+        # Define specific criteria for validating each type of legislative term
         validation_criteria = {
-            "pork_barrel_spending": "Focus on verifying specific spending amounts and clear pork_barrel_spending designations. Ignore interpretative analysis.",
-            "trojan_horses": f"Focus on provisions that explicitly and significantly deviate from the stated purpose: {context}",
-            "sleeper_provisions": "Focus on provisions with clear textual evidence of hidden significant impact.",
-            "beneficiaries": "Focus on explicitly named beneficiaries and clearly defined benefits."
+            "pork_barrel_spending": """
+                Verify that identified provisions match the definition of pork barrel spending:
+                1. Localized or targeted spending that primarily benefits a specific district/region
+                2. Added to the bill without clear national benefit or purpose
+                3. Often inserted during the appropriations process
+                4. Usually benefits a specific constituency or special interest
+                
+                Only flag if the identified spending does NOT meet these criteria.""",
+            "trojan_horses": f"""
+                Verify that identified provisions match the definition of legislative trojan horses:
+                1. Substantive provisions unrelated to bill's original purpose: {context}
+                2. Added to increase chances of passage or avoid scrutiny
+                3. Would likely not pass as standalone legislation
+                4. Significantly changes bill scope or impact
+                
+                Only flag if the provisions do NOT meet these criteria.""",
+            "sleeper_provisions": """
+                Verify that identified provisions match the definition of sleeper provisions:
+                1. Subtle but significant changes to existing law or policy
+                2. Impact not immediately apparent
+                3. Takes effect after a delay or trigger event
+                4. Technical language that masks broader implications
+                
+                Only flag if the provisions do NOT meet these criteria.""",
+            "beneficiaries": """
+                Verify that identified beneficiaries analysis properly identifies:
+                1. Direct vs indirect benefits
+                2. Intended vs unintended beneficiaries
+                3. Short-term vs long-term benefits
+                4. Conditional vs unconditional benefits
+                
+                Only flag if the analysis does NOT properly distinguish these aspects."""
         }.get(finding_type, "")
         
         for chunk in text_chunks:
             llm_response = llm.invoke([{
                 "role": "system",
-                "content": f"""You are a rigorous fact-checking agent specializing in legislative analysis.
-                Focus ONLY on major factual errors and clear misinformation.
+                "content": f"""You are a legislative analysis expert focusing on proper use of legislative terms and concepts.
                 
                 {validation_criteria}
                 
-                Only flag issues that:
-                1. Directly contradict the source text
-                2. Make specific claims with no supporting evidence
-                3. Significantly misrepresent key provisions
+                Only flag cases where:
+                1. The term is misapplied based on standard legislative definitions
+                2. The identified provision doesn't meet the core criteria for the term
+                3. The analysis misunderstands the legislative mechanism or effect
                 
-                Ignore issues that are:
-                1. Matters of interpretation or analysis
-                2. Minor details or wording differences
-                3. Reasonable extrapolations
-                4. Contextual information from other sources"""
+                Do not flag:
+                1. Subjective interpretations of impact
+                2. Policy disagreements
+                3. Minor technical details
+                4. Valid alternate interpretations"""
             }, {
                 "role": "user",
                 "content": f"""Findings Summary: {findings_summary}
@@ -740,33 +767,33 @@ Detailed Findings: {findings}
 
 Bill Text Section: {chunk.page_content}
 
-List ONLY:
-1. Major factual errors (with specific evidence)
-2. Clear misrepresentations of the text
-3. Significant claims that have no support anywhere in the text
+Analyze whether the legislative terms and concepts are used correctly. List ONLY:
+1. Clear misapplications of legislative terms (with explanation)
+2. Provisions that don't meet the standard definition
+3. Fundamental misunderstandings of legislative mechanisms
 
-Focus only on issues serious enough to require revision."""
+Focus only on proper use of terms and concepts, not factual accuracy."""
             }])
             if llm_response.content.strip():
                 all_validations.append(llm_response.content)
         
         # Synthesize findings across all chunks
         if all_validations:
-            synthesis_prompt = f"""Review all validations and identify only the most serious issues:
+            synthesis_prompt = f"""Review all validations and identify only serious misuse of legislative terms:
 
 Validations from all chunks:
 {'\n'.join(all_validations)}
 
 List ONLY:
-1. Critical factual errors that must be corrected
-2. Significant misrepresentations of the bill
-3. Major claims that have no support anywhere in the text
+1. Consistent misapplication of legislative terms
+2. Fundamental misunderstandings of legislative concepts
+3. Incorrect categorization of provisions
 
-Ignore minor issues, subjective interpretations, or reasonable extrapolations."""
+Focus on proper use of legislative terminology and concepts."""
             
             final_response = llm.invoke([{
                 "role": "system",
-                "content": f"Focus only on major issues that clearly require revision. Ignore minor or subjective discrepancies."
+                "content": f"Focus only on major misuse of legislative terms and concepts. Ignore minor terminology issues."
             }, {
                 "role": "user",
                 "content": synthesis_prompt
@@ -783,18 +810,18 @@ Ignore minor issues, subjective interpretations, or reasonable extrapolations.""
         ("beneficiaries", validate_findings(beneficiaries, "beneficiaries", text_chunks))
     ]
     
-    # Only consider significant issues
+    # Only consider significant term misuse
     significant_issues = any(
         validation for _, validation in validations 
-        if validation.strip() and ("clear" in validation.lower() or "significant" in validation.lower() or "critical" in validation.lower())
+        if validation.strip() and any(term in validation.lower() for term in ["misapplied", "incorrect", "misunderstood", "doesn't meet criteria"])
     )
     
     if significant_issues:
         # Create detailed feedback
-        feedback = f"Investigation Correction Feedback (Attempt {current_attempts} of {MAX_CORRECTION_ATTEMPTS}):\n"
+        feedback = f"Legislative Term Usage Feedback (Attempt {current_attempts} of {MAX_CORRECTION_ATTEMPTS}):\n"
         for finding_type, validation in validations:
             if validation.strip():
-                feedback += f"\n{finding_type.title()} Critical Issues:\n{validation}\n"
+                feedback += f"\n{finding_type.title()} Term Usage Issues:\n{validation}\n"
         
         return {
             **state,
