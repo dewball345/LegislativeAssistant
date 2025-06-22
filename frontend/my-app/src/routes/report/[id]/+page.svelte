@@ -27,7 +27,7 @@
 </script>
 
 <div class="container mt-4">
-    <h2 class="mb-4">Report for "{storedData ? storedData.bill_metadata.bill.title : "Loading"}"</h2>
+    <h2 class="mb-4 serif-header">Report for "{storedData ? storedData.bill_metadata.bill.title : "Loading"}"</h2>
 
     {#if storedData?.summaries?.levels}
         <SummaryCard levels={storedData.summaries.levels} />

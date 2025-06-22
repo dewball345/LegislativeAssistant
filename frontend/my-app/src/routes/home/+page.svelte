@@ -162,7 +162,7 @@
                     <div
                         class="d-flex justify-content-between align-items-center mb-3"
                     >
-                        <h4 class="mb-0">Your Profile</h4>
+                        <h4 class="mb-0 fw-bold serif-header">Your Profile</h4>
                         <button
                             class="btn btn-{isEditing
                                 ? 'primary'
@@ -177,7 +177,7 @@
                             <div class="row g-2">
                                 <div class="col-4">
                                     <label for="name" class="form-label small"
-                                        >Name</label
+                                        ><h6 class="serif-header">Name</h6></label
                                     >
                                     <input
                                         type="text"
@@ -189,7 +189,7 @@
                                 </div>
                                 <div class="col-4">
                                     <label for="gender" class="form-label small"
-                                        >Gender</label
+                                        ><h6 class="serif-header">Gender</h6></label
                                     >
                                     <input
                                         type="text"
@@ -201,7 +201,7 @@
                                 </div>
                                 <div class="col-4">
                                     <label for="profession" class="form-label small"
-                                        >Profession</label
+                                        ><h6 class="serif-header">Profession</h6></label
                                     >
                                     <input
                                         type="text"
@@ -215,7 +215,7 @@
                         </div>
                         <div class="col-12">
                             <label for="location" class="form-label small"
-                                >Location (City, State ZIP)</label
+                                ><h6 class="serif-header">Location (City, State ZIP)</h6></label
                             >
                             <input
                                 type="text"
@@ -227,7 +227,7 @@
                             />
                         </div>
                         <div class="col-12">
-                            <label class="form-label small">Top Priorities</label>
+                            <label class="form-label small"><h6 class="serif-header">Top Priorities</h6></label>
                             <div class="row g-2">
                                 {#each interestCategories as category}
                                     <div class="col-6">
@@ -259,7 +259,7 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label small"
-                                >Additional Information</label
+                                ><h6 class="serif-header">Additional Information</h6></label
                             >
                             <textarea
                                 class="form-control form-control-sm"
@@ -277,9 +277,9 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="mb-1">Generate Report</h4>
+                    <h4 class="mb-1 fw-bold serif-header">Generate Report</h4>
                     <div class="mb-3">
-                        <label class="h6 form-label mt-2">Enter Bill Code...</label>
+                        <label class="form-label mt-2"><h6 class="serif-header">Enter Bill Code...</h6></label>
                         <div class="row g-2">
                             <div class="col-3">
                                 <input
@@ -316,7 +316,7 @@
                     </div>
 
                     <div class="mt-3">
-                        <h4 class="h6 mb-2">...or try Recommended Bills</h4>
+                        <h6 class="serif-header mb-2">...or try Recommended Bills</h6>
                         <div class="row g-2">
                             {#each recommendedBills as bill}
                                 <div class="col">
@@ -344,7 +344,7 @@
     <!-- Past Reports Section -->
     <div class="row mt-4">
         <div class="col-12">
-            <h1 class="h3 mb-3">Past Reports</h1>
+            <h3 class="mb-3 fw-bold serif-header">Past Reports</h3>
             <div class="row g-3">
                 {#if pastReports.length > 0}
                     {#each pastReports as report}
@@ -355,7 +355,7 @@
                                         class="d-flex justify-content-between align-items-start"
                                     >
                                         <div>
-                                            <h5 class="h6 mb-1">{report.result.bill_metadata.bill.title}</h5>
+                                            <h6 class="serif-header mb-1 me-1">{report.result.bill_metadata.bill.title}</h6>
                                             <div class="text-muted small">
                                                 <div>{report.billId}</div>
                                                 <div>{report.date}</div>
