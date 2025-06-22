@@ -145,14 +145,43 @@
     }
 
     let recommendedBills = [
-        { id: "HR1234", title: "Climate Change Act 2025" },
-        { id: "S789", title: "Healthcare Reform Bill" },
-        { id: "HR456", title: "Education Funding Act" },
+        { 
+            congress: "118",
+            type: "hr",
+            number: "7024",
+            title: "America's Financial Security Act of 2024",
+            description: "A comprehensive bill addressing financial and banking regulations"
+        },
+        { 
+            congress: "118",
+            type: "hr",
+            number: "3374",
+            title: "Digital Asset Market Structure Act",
+            description: "Establishing a framework for digital asset regulation"
+        },
+        { 
+            congress: "118",
+            type: "hr",
+            number: "7532",
+            title: "AI Security and Transparency Act",
+            description: "Regulating artificial intelligence development and deployment"
+        }
     ];
+
+    function handleRecommendedBill(bill: typeof recommendedBills[0]) {
+        billDetails.congress = bill.congress;
+        billDetails.type = bill.type;
+        billDetails.number = bill.number;
+        handleGenerateReport();
+    }
 </script>
 
 {#if status === 'loading'}
-    <h1>Loading....</h1>
+    <div class="d-flex justify-content-center align-items-center p-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 {:else}
     <div class="row g-3">
         <!-- Profile Section -->
@@ -319,16 +348,18 @@
                         <h6 class="serif-header mb-2">...or try Recommended Bills</h6>
                         <div class="row g-2">
                             {#each recommendedBills as bill}
-                                <div class="col">
+                                <div class="col-md-4">
                                     <div class="card h-100">
-                                        <div class="card-body p-2">
-                                            <div class="d-flex flex-column">
-                                                <span class="fw-medium small"
-                                                    >{bill.id}</span
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title h6 serif-header mb-2">{bill.title}</h5>
+                                            <p class="card-text small text-muted mb-3">{bill.description}</p>
+                                            <div class="mt-auto">
+                                                <button
+                                                    class="btn btn-outline-primary btn-sm w-100"
+                                                    onclick={() => handleRecommendedBill(bill)}
                                                 >
-                                                <small class="text-muted"
-                                                    >{bill.title}</small
-                                                >
+                                                    Analyze {bill.type} {bill.number}
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
